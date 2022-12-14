@@ -2,9 +2,9 @@ package com.hfy.nested_scrolling_layout2;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -184,7 +184,7 @@ public class NestedScrollingParent2LayoutImpl3 extends NestedScrollingParent2Lay
 
         //直接获取外层RecyclerView
         mParentRecyclerView = getRecyclerView(this);
-        Log.i(TAG, "onFinishInflate: mParentRecyclerView=" + mParentRecyclerView);
+//        Log.i(TAG, "onFinishInflate: mParentRecyclerView=" + mParentRecyclerView);
 
         //关于内层RecyclerView：此时还获取不到ViewPager内fragment的RecyclerView，需要在加载ViewPager后 fragment可见时 传入
     }
@@ -209,6 +209,15 @@ public class NestedScrollingParent2LayoutImpl3 extends NestedScrollingParent2Lay
      */
     public void setChildRecyclerView(RecyclerView childRecyclerView) {
         mChildRecyclerView = childRecyclerView;
+        if(childRecyclerView != null) {
+            ViewParent lastItemView = childRecyclerView;
+            while (!(lastItemView.getParent() instanceof RecyclerView)) {
+                lastItemView = lastItemView.getParent();
+            }
+            if(lastItemView != childRecyclerView) {
+                mLastItemView = (View) lastItemView;
+            }
+        }
     }
 
 

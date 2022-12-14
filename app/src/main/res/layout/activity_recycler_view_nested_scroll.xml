@@ -1,12 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.hfy.nested_scrolling_layout2.NestedScrollingParent2LayoutImpl3 xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/nested_scrolling_parent2_layout"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView_parent"
+    <TextView
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="50dp"
+        android:includeFontPadding="false"
+        android:background="@android:color/holo_blue_light"
+        android:gravity="center"
+        android:textSize="30sp"
+        android:textColor="#121212"
+        android:text="头部布局"/>
 
-</com.hfy.nested_scrolling_layout2.NestedScrollingParent2LayoutImpl3>
+    <com.hfy.nested_scrolling_layout2.NestedScrollingParent2LayoutImpl3
+        android:id="@+id/nested_scrolling_parent2_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView_parent"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </com.hfy.nested_scrolling_layout2.NestedScrollingParent2LayoutImpl3>
+</LinearLayout>

@@ -1,11 +1,5 @@
 package com.hfy.nestedscrolling.adapter;
 
-import android.view.ViewTreeObserver;
-
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
-import androidx.viewpager.widget.ViewPager;
-
 import com.chad.library.adapter.base.BaseMultiItemQuickAdapter;
 import com.chad.library.adapter.base.entity.MultiItemEntity;
 import com.chad.library.adapter.base.viewholder.BaseViewHolder;
@@ -19,6 +13,10 @@ import com.hfy.nestedscrolling.fragment.ViewPagerBean;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.viewpager.widget.ViewPager;
 
 /**
  * @author hufeiyang
@@ -88,16 +86,6 @@ public class RecyclerNestAdapter extends BaseMultiItemQuickAdapter<MultiItemEnti
 
         TabLayout tab = (TabLayout) baseViewHolder.getView(R.id.tab_layout);
         tab.setupWithViewPager(viewPager);
-
-        if (mNestedScrollingParent2Layout != null) {
-            mNestedScrollingParent2Layout.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-                @Override
-                public void onGlobalLayout() {
-                    //设置最后一个item：tab+viewPager
-                    mNestedScrollingParent2Layout.setLastItem(baseViewHolder.itemView);
-                }
-            });
-        }
 
     }
 

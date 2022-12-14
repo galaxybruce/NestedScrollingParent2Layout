@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.view.NestedScrollingParent2;
 import androidx.core.view.NestedScrollingParentHelper;
+import androidx.core.view.ViewCompat;
 
 /**
  * Description:  通用 滑动嵌套处理布局，用于处理含有{@link androidx.recyclerview.widget.RecyclerView}的嵌套套滑动
@@ -35,11 +36,12 @@ public class NestedScrollingParent2Layout extends LinearLayout implements Nested
      *
      * @param child            嵌套滑动对应的父类的子类(因为嵌套滑动对于的父View不一定是一级就能找到的，可能挑了两级父View的父View，child的辈分>=target)
      * @param target           具体嵌套滑动的那个子类
-     * @param nestedScrollAxes 支持嵌套滚动轴。水平方向，垂直方向，或者不指定
+     * @param axes              支持嵌套滚动轴。水平方向，垂直方向，或者不指定
      * @param type             滑动类型，ViewCompat.TYPE_NON_TOUCH fling 效果ViewCompat.TYPE_TOUCH 手势滑动
      */
     @Override
-    public boolean onStartNestedScroll(@NonNull View child, @NonNull View target, int nestedScrollAxes, int type) {
+    public boolean onStartNestedScroll(@NonNull View child, @NonNull View target, @ViewCompat.ScrollAxis int axes,
+                                       @ViewCompat.NestedScrollType int type) {
         //自己处理逻辑
         return true;
     }

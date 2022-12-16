@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
+import com.hfy.nested_scrolling_layout2.NestedScrollingParent2Layout;
 import com.hfy.nested_scrolling_layout2.NestedScrollingParent2LayoutImpl3;
 import com.hfy.nestedscrolling.R;
 
@@ -133,9 +134,9 @@ public class NestedScrollTestFragment extends Fragment {
 //            if (mNestedScrollingParent2Layout != null) {
 //                mNestedScrollingParent2Layout.setChildRecyclerView(recyclerView);
 //            }
-            NestedScrollingParent2LayoutImpl3 nestedLayout = NestedScrollingParent2LayoutImpl3.findSelf(this);
-            if(nestedLayout != null) {
-                nestedLayout.setChildRecyclerView(recyclerView, mOnScrollListener);
+            NestedScrollingParent2Layout nestedLayout = NestedScrollingParent2LayoutImpl3.findSelf(this);
+            if(nestedLayout instanceof NestedScrollingParent2LayoutImpl3) {
+                ((NestedScrollingParent2LayoutImpl3)nestedLayout).setChildRecyclerView(recyclerView, mOnScrollListener);
             }
         }
     }
@@ -145,9 +146,9 @@ public class NestedScrollTestFragment extends Fragment {
         super.onResume();
 
         if (isCurrentDisplayedFragment()) {
-            NestedScrollingParent2LayoutImpl3 nestedLayout = NestedScrollingParent2LayoutImpl3.findSelf(this);
-            if(nestedLayout != null) {
-                nestedLayout.setChildRecyclerView(recyclerView, mOnScrollListener);
+            NestedScrollingParent2Layout nestedLayout = NestedScrollingParent2LayoutImpl3.findSelf(this);
+            if(nestedLayout instanceof NestedScrollingParent2LayoutImpl3) {
+                ((NestedScrollingParent2LayoutImpl3)nestedLayout).setChildRecyclerView(recyclerView, mOnScrollListener);
             }
         }
     }

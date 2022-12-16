@@ -271,15 +271,15 @@ public class NestedScrollingParent2LayoutImpl3 extends NestedScrollingParent2Lay
      * @param lastItemFragment
      * @return
      */
-    public static NestedScrollingParent2LayoutImpl3 findSelf(Fragment lastItemFragment) {
+    public static NestedScrollingParent2Layout findSelf(Fragment lastItemFragment) {
         View fragmentView = lastItemFragment.getView();
         if(fragmentView != null) {
             View nestedLayout = fragmentView;
-            while (!(nestedLayout instanceof NestedScrollingParent2LayoutImpl3)) {
+            while (!(nestedLayout instanceof NestedScrollingParent2Layout) && (nestedLayout.getParent() instanceof View)) {
                 nestedLayout = (View)nestedLayout.getParent();
             }
-            if(nestedLayout != fragmentView) {
-                return (NestedScrollingParent2LayoutImpl3)nestedLayout;
+            if(nestedLayout instanceof NestedScrollingParent2Layout) {
+                return (NestedScrollingParent2Layout)nestedLayout;
             }
         }
         return null;

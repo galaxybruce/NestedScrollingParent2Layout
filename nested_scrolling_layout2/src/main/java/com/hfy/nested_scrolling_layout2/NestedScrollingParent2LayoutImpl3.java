@@ -1,6 +1,7 @@
 package com.hfy.nested_scrolling_layout2;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +10,7 @@ import android.view.ViewParent;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.view.ViewCompat;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 /**
@@ -75,7 +77,7 @@ public class NestedScrollingParent2LayoutImpl3 extends NestedScrollingParent2Lay
             return;
         }
 
-        int lastItemTop = mLastItemView.getTop();
+        int lastItemTop = mLastItemView.getTop() - ((MarginLayoutParams)mLastItemView.getLayoutParams()).topMargin;;
 
         if (target == mParentRecyclerView) {
             handleParentRecyclerViewScroll(lastItemTop, dy, consumed);
@@ -189,6 +191,11 @@ public class NestedScrollingParent2LayoutImpl3 extends NestedScrollingParent2Lay
         //关于内层RecyclerView：此时还获取不到ViewPager内fragment的RecyclerView，需要在加载ViewPager后 fragment可见时 传入
     }
 
+    /**
+     * 获取最外层RecyclerView
+     * @param viewGroup
+     * @return
+     */
     private RecyclerView getRecyclerView(ViewGroup viewGroup) {
         int childCount = viewGroup.getChildCount();
         for (int i = 0; i < childCount; i++) {
@@ -209,15 +216,49 @@ public class NestedScrollingParent2LayoutImpl3 extends NestedScrollingParent2Lay
      */
     public void setChildRecyclerView(RecyclerView childRecyclerView) {
         mChildRecyclerView = childRecyclerView;
+
+        // 查找外部RecyclerView中的最后一个itemView，也就是包含ViewPager的itemView
         if(childRecyclerView != null) {
             ViewParent lastItemView = childRecyclerView;
-            while (!(lastItemView.getParent() instanceof RecyclerView)) {
+            String recycleViewClassName = RecyclerView.class.getName();
+            while (!(TextUtils.equals(lastItemView.getParent().getClass().getName(), recycleViewClassName))) {
                 lastItemView = lastItemView.getParent();
             }
             if(lastItemView != childRecyclerView) {
                 mLastItemView = (View) lastItemView;
             }
         }
+    }
+
+    /**
+     * 从最后一个ItemView/ViewPager/Fragment中方向查找NestedScrollingParent2LayoutImpl3
+     *
+     * 在Fragment#onVisibleToUserChanged方法中调用
+     * override fun onVisibleToUserChanged(isVisibleToUser: Boolean) {
+     *     super.onVisibleToUserChanged(isVisibleToUser)
+     *     if(isVisibleToUser) {
+     *         val nestedLayout = NestedScrollingParent2LayoutImpl3.findSelf(this)
+     *         nestedLayout?.let {
+     *             nestedLayout.setChildRecyclerView(binding.recyclerView.recyclerView)
+     *         }
+     *     }
+     * }
+     *
+     * @param lastItemFragment
+     * @return
+     */
+    public static NestedScrollingParent2LayoutImpl3 findSelf(Fragment lastItemFragment) {
+        View fragmentView = lastItemFragment.getView();
+        if(fragmentView != null) {
+            View nestedLayout = fragmentView;
+            while (!(nestedLayout instanceof NestedScrollingParent2LayoutImpl3)) {
+                nestedLayout = (View)nestedLayout.getParent();
+            }
+            if(nestedLayout != fragmentView) {
+                return (NestedScrollingParent2LayoutImpl3)nestedLayout;
+            }
+        }
+        return null;
     }
 
 

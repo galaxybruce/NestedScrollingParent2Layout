@@ -122,8 +122,12 @@ public class NestedScrollTestFragment extends Fragment {
         super.setUserVisibleHint(visibleToUser);
 
         if (visibleToUser && isCurrentDisplayedFragment()) {
-            if (mNestedScrollingParent2Layout != null) {
-                mNestedScrollingParent2Layout.setChildRecyclerView(recyclerView);
+//            if (mNestedScrollingParent2Layout != null) {
+//                mNestedScrollingParent2Layout.setChildRecyclerView(recyclerView);
+//            }
+            NestedScrollingParent2LayoutImpl3 nestedLayout = NestedScrollingParent2LayoutImpl3.findSelf(this);
+            if(nestedLayout != null) {
+                nestedLayout.setChildRecyclerView(recyclerView);
             }
         }
     }
@@ -133,8 +137,9 @@ public class NestedScrollTestFragment extends Fragment {
         super.onResume();
 
         if (isCurrentDisplayedFragment()) {
-            if (mNestedScrollingParent2Layout != null) {
-                mNestedScrollingParent2Layout.setChildRecyclerView(recyclerView);
+            NestedScrollingParent2LayoutImpl3 nestedLayout = NestedScrollingParent2LayoutImpl3.findSelf(this);
+            if(nestedLayout != null) {
+                nestedLayout.setChildRecyclerView(recyclerView);
             }
         }
     }

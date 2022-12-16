@@ -17,15 +17,29 @@ import androidx.recyclerview.widget.RecyclerView;
  * 处理RecyclerView 套viewPager， viewPager内的fragment中 也有RecyclerView，处理外层、内层 RecyclerView的嵌套滑动问题
  * 类似淘宝、京东首页
  *
+ * 使用方式：
+ * 1. 布局中用NestedScrollingParent2LayoutImpl3嵌套外层RecyclerView
+ * 2. 从外层RecyclerView最后一个ItemView/ViewPager/Fragment中反向查找NestedScrollingParent2LayoutImpl3
+ * 在Fragment#onVisibleToUserChanged方法中调用
+ * override fun onVisibleToUserChanged(isVisibleToUser: Boolean) {
+ *     super.onVisibleToUserChanged(isVisibleToUser)
+ *     if(isVisibleToUser) {
+ *         val nestedLayout = NestedScrollingParent2LayoutImpl3.findSelf(this)
+ *         nestedLayout?.let {
+ *             nestedLayout.setChildRecyclerView(binding.recyclerView.recyclerView)
+ *         }
+ *     }
+ * }
+ *
+ *
  */
 public class NestedScrollingParent2LayoutImpl3 extends NestedScrollingParent2Layout {
 
     private final String TAG = this.getClass().getSimpleName();
 
     private RecyclerView mParentRecyclerView;
-
-
     private RecyclerView mChildRecyclerView;
+    private RecyclerView.OnScrollListener mOnScrollListenerOfChildRecyclerView;
 
     private View mLastItemView;
 
@@ -186,7 +200,15 @@ public class NestedScrollingParent2LayoutImpl3 extends NestedScrollingParent2Lay
 
         //直接获取外层RecyclerView
         mParentRecyclerView = getRecyclerView(this);
-//        Log.i(TAG, "onFinishInflate: mParentRecyclerView=" + mParentRecyclerView);
+        mParentRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                // 内层RecyclerView滑动事件状态不执行，需要外层传递进去
+                if(mOnScrollListenerOfChildRecyclerView != null) {
+                    mOnScrollListenerOfChildRecyclerView.onScrollStateChanged(recyclerView, newState);
+                }
+            }
+        });
 
         //关于内层RecyclerView：此时还获取不到ViewPager内fragment的RecyclerView，需要在加载ViewPager后 fragment可见时 传入
     }
@@ -214,8 +236,10 @@ public class NestedScrollingParent2LayoutImpl3 extends NestedScrollingParent2Lay
      *
      * @param childRecyclerView
      */
-    public void setChildRecyclerView(RecyclerView childRecyclerView) {
+    public void setChildRecyclerView(RecyclerView childRecyclerView,
+                                     RecyclerView.OnScrollListener onScrollListenerOfChildRecyclerView) {
         mChildRecyclerView = childRecyclerView;
+        mOnScrollListenerOfChildRecyclerView = onScrollListenerOfChildRecyclerView;
 
         // 查找外部RecyclerView中的最后一个itemView，也就是包含ViewPager的itemView
         if(childRecyclerView != null) {
@@ -231,7 +255,7 @@ public class NestedScrollingParent2LayoutImpl3 extends NestedScrollingParent2Lay
     }
 
     /**
-     * 从最后一个ItemView/ViewPager/Fragment中方向查找NestedScrollingParent2LayoutImpl3
+     * 从外层RecyclerView最后一个ItemView/ViewPager/Fragment中反向查找NestedScrollingParent2LayoutImpl3
      *
      * 在Fragment#onVisibleToUserChanged方法中调用
      * override fun onVisibleToUserChanged(isVisibleToUser: Boolean) {

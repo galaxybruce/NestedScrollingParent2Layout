@@ -1,10 +1,12 @@
 package com.hfy.nestedscrolling.fragment;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -34,7 +36,7 @@ public class NestedScrollTestFragment extends Fragment {
     private String mParam2;
 
     private NestedScrollingParent2LayoutImpl3 mNestedScrollingParent2Layout;
-
+    private RecyclerView.OnScrollListener mOnScrollListener;
 
     private int mFragmentIndex;
 
@@ -109,7 +111,13 @@ public class NestedScrollTestFragment extends Fragment {
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setAdapter(new NestedScrollTestRecyclerViewAdapter(getContext(), dataBeans));
-
+        mOnScrollListener = new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                Log.i("aaaaaaaaaaaaa", "onScrollStateChanged: " + newState);
+            }
+        };
     }
 
     /**
@@ -127,7 +135,7 @@ public class NestedScrollTestFragment extends Fragment {
 //            }
             NestedScrollingParent2LayoutImpl3 nestedLayout = NestedScrollingParent2LayoutImpl3.findSelf(this);
             if(nestedLayout != null) {
-                nestedLayout.setChildRecyclerView(recyclerView);
+                nestedLayout.setChildRecyclerView(recyclerView, mOnScrollListener);
             }
         }
     }
@@ -139,7 +147,7 @@ public class NestedScrollTestFragment extends Fragment {
         if (isCurrentDisplayedFragment()) {
             NestedScrollingParent2LayoutImpl3 nestedLayout = NestedScrollingParent2LayoutImpl3.findSelf(this);
             if(nestedLayout != null) {
-                nestedLayout.setChildRecyclerView(recyclerView);
+                nestedLayout.setChildRecyclerView(recyclerView, mOnScrollListener);
             }
         }
     }

@@ -17,7 +17,7 @@ import androidx.core.view.ViewCompat;
 public class NestedScrollingParent2Layout extends LinearLayout implements NestedScrollingParent2 {
 
 
-    private NestedScrollingParentHelper mNestedScrollingParentHelper = new NestedScrollingParentHelper(this);
+    private final NestedScrollingParentHelper mNestedScrollingParentHelper = new NestedScrollingParentHelper(this);
 
     public NestedScrollingParent2Layout(Context context) {
         super(context);

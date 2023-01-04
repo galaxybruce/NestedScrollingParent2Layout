@@ -35,8 +35,6 @@ import androidx.recyclerview.widget.RecyclerView;
  */
 public class NestedScrollingParent2LayoutImpl3 extends NestedScrollingParent2Layout {
 
-    private final String TAG = this.getClass().getSimpleName();
-
     private RecyclerView mParentRecyclerView;
     private RecyclerView mChildRecyclerView;
     private RecyclerView.OnScrollListener mOnScrollListenerOfChildRecyclerView;
@@ -67,7 +65,8 @@ public class NestedScrollingParent2LayoutImpl3 extends NestedScrollingParent2Lay
      * @param type             滑动类型，ViewCompat.TYPE_NON_TOUCH fling 效果ViewCompat.TYPE_TOUCH 手势滑动
      */
     @Override
-    public boolean onStartNestedScroll(@NonNull View child, @NonNull View target, int nestedScrollAxes, int type) {
+    public boolean onStartNestedScroll(@NonNull View child, @NonNull View target,
+                                       int nestedScrollAxes, @ViewCompat.NestedScrollType int type) {
         //自己处理逻辑
         //这里处理是接受 竖向的 嵌套滑动
         return nestedScrollAxes == ViewCompat.SCROLL_AXIS_VERTICAL;
@@ -84,15 +83,14 @@ public class NestedScrollingParent2LayoutImpl3 extends NestedScrollingParent2Lay
      * @param type     滑动类型，ViewCompat.TYPE_NON_TOUCH fling 效果ViewCompat.TYPE_TOUCH 手势滑动
      */
     @Override
-    public void onNestedPreScroll(@NonNull View target, int dx, int dy, @NonNull int[] consumed, int type) {
+    public void onNestedPreScroll(@NonNull View target, int dx, int dy,
+                                  @NonNull int[] consumed, @ViewCompat.NestedScrollType int type) {
         //自己处理逻辑
-
         if (mLastItemView == null) {
             return;
         }
 
-        int lastItemTop = mLastItemView.getTop() - ((MarginLayoutParams)mLastItemView.getLayoutParams()).topMargin;;
-
+        int lastItemTop = mLastItemView.getTop() - ((MarginLayoutParams)mLastItemView.getLayoutParams()).topMargin;
         if (target == mParentRecyclerView) {
             handleParentRecyclerViewScroll(lastItemTop, dy, consumed);
         }
@@ -101,7 +99,6 @@ public class NestedScrollingParent2LayoutImpl3 extends NestedScrollingParent2Lay
 //        else if (target == mChildRecyclerView) {
 //            handleChildRecyclerViewScroll(lastItemTop, dy, consumed);
 //        }
-
     }
 
     /**
@@ -126,22 +123,31 @@ public class NestedScrollingParent2LayoutImpl3 extends NestedScrollingParent2Lay
                 }
             } else {
                 //向下滑，就让外部RecyclerView自行处理
+                if(!mParentRecyclerView.canScrollVertically(-1)) {
+                    // mParentRecyclerView已经滚动到顶部时，外层停止滚动事件，否则外层一直在假滚动，导致TabLayout无法点击
+                    mParentRecyclerView.stopScroll();
+                }
             }
         } else {
             //tab上边到顶了
             if (dy > 0){
                 //向上，内层直接消费掉
-                mChildRecyclerView.scrollBy(0, dy);
-                consumed[1] = dy;
+                if(mChildRecyclerView.canScrollVertically(1)) {
+                    mChildRecyclerView.scrollBy(0, dy);
+                    consumed[1] = dy;
+                } else {
+                    // mChildRecyclerView已经滚动到底部时，外层停止滚动事件，否则外层一直在假滚动，导致TabLayout无法点击
+                    mParentRecyclerView.stopScroll();
+                }
             }else {
                 int childScrolledY = mChildRecyclerView.computeVerticalScrollOffset();
                 if (childScrolledY > Math.abs(dy)) {
                     //内层已滚动的距离，大于想要滚动的距离，内层直接消费掉
                     mChildRecyclerView.scrollBy(0, dy);
                     consumed[1] = dy;
-                }else {
+                } else {
                     //内层已滚动的距离，小于想要滚动的距离，那么内层消费一部分，到顶后，剩的还给外层自行滑动
-                    mChildRecyclerView.scrollBy(0, childScrolledY);
+                    mChildRecyclerView.scrollBy(0, -childScrolledY);
                     consumed[1] = -childScrolledY;
                 }
             }
@@ -200,16 +206,17 @@ public class NestedScrollingParent2LayoutImpl3 extends NestedScrollingParent2Lay
 
         //直接获取外层RecyclerView
         mParentRecyclerView = getRecyclerView(this);
-        mParentRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
-                // 内层RecyclerView滑动事件状态不执行，需要外层传递进去
-                if(mOnScrollListenerOfChildRecyclerView != null) {
-                    mOnScrollListenerOfChildRecyclerView.onScrollStateChanged(recyclerView, newState);
+        if(mParentRecyclerView != null) {
+            mParentRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                @Override
+                public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                    // 内层RecyclerView滑动事件状态不执行，需要外层传递进去
+                    if (mOnScrollListenerOfChildRecyclerView != null) {
+                        mOnScrollListenerOfChildRecyclerView.onScrollStateChanged(recyclerView, newState);
+                    }
                 }
-            }
-        });
-
+            });
+        }
         //关于内层RecyclerView：此时还获取不到ViewPager内fragment的RecyclerView，需要在加载ViewPager后 fragment可见时 传入
     }
 

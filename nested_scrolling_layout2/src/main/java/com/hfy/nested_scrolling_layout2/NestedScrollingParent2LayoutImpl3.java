@@ -282,7 +282,7 @@ public class NestedScrollingParent2LayoutImpl3 extends NestedScrollingParent2Lay
         View fragmentView = lastItemFragment.getView();
         if(fragmentView != null) {
             View nestedLayout = fragmentView;
-            while (!(nestedLayout instanceof NestedScrollingParent2Layout) && (nestedLayout.getParent() instanceof View)) {
+            while (nestedLayout != null && !(nestedLayout instanceof NestedScrollingParent2Layout) && (nestedLayout.getParent() instanceof View)) {
                 nestedLayout = (View)nestedLayout.getParent();
             }
             if(nestedLayout instanceof NestedScrollingParent2Layout) {
